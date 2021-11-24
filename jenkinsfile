@@ -1,7 +1,7 @@
 node {
-
+    agent any
     triggers {
-        githubPush()
+        pollSCM('')
     }
     stage("Git Clone"){
 
