@@ -1,0 +1,33 @@
+properties([pipelineTriggers([githubPush()])])
+node {
+
+    stage("Git Clone"){
+
+        git credentialsId: '62120c62-faf8-49f9-b0b2-de053c4328f6', url: 'https://github.com/marifse/test', branch: 'main'
+    }
+
+     stage('Gradle Build') {
+
+       sh './gradlew build'
+
+    }
+
+    stage("Docker build"){
+        sh 'docker version'
+        sh 'docker build -t jhooq-docker-demo .'
+        sh 'docker image list'
+        sh 'docker tag jhooq-docker-demo premsubudhi/jhooq-docker-demo1'
+    }
+
+    withCredentials([string(credentialsId: 'dockerhub-access', variable: 'PASSWORD')]) {
+        sh 'sudo docker login -u premsubudhi -p $PASSWORD'
+    }
+
+    stage("Push Image to Docker Hub"){
+        sh 'sudo docker push premsubudhi/jhooq-docker-demo1'
+    }
+    
+    stage("kubernetes deployment"){
+        sh 'kubectl apply -f k8s-spring-boot-deployment.yml'
+    }
+} 
