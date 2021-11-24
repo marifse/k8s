@@ -1,5 +1,8 @@
 node {
 
+    triggers {
+        githubPush()
+    }
     stage("Git Clone"){
 
         git credentialsId: '62120c62-faf8-49f9-b0b2-de053c4328f6', url: 'https://github.com/marifse/k8s', branch: 'main'
